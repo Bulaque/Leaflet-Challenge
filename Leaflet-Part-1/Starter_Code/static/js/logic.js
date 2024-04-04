@@ -4,90 +4,135 @@
 // Include popups that provide additional information about the earthquake when its associated marker is clicked.
 // Create a legend that will provide context for your map data.
 
-  // Create map
-  let mymap = L.map("map", {
-    center: [37, -95],
-    zoom: 35,
+///// 2 /////
+let queryurl = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+
+///// 2 /////
+d3.json(queryurl).then(function(data) {
+  createFeatures(data.features);
   });
 
-  // Adding a tile layer
-  let streetlayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(mymap);
+///// 2 /////
+function createFeatures(EQdata) {
+  function onEachFeature(feature, layer) {
+    layer.bindPopup(`${feature.properties.title}`);
+  }
+  let EQ = L.geoJSON(EQdata, {
+    onEachFeature: onEachFeature
+  });
+  createMap(EQ);
+}
 
-  let queryurl = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+///// 2 /////
+function createMap(EQ) {
 
-  let mapstyle = {
-    color: "red",
-    fillcolor: "blue",
-    fillOpacity: 0.5,
-    weight: 1.5
+  let street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  })
+
+  let baseMaps = {
+    "Street Map": street
   };
 
-  d3.json(queryurl).then(function(data) {
-    L.geoJson(data, {
-      style: mapstyle
-    }).addTo(mymap);
-  });
+  let OLM = {
+    Earthquakes: EQ
+  };
 
-  //function createFeatures(EQdata) {
-  
-    //function onEachFeature(feature, layer) {
-      //layer.bindPopup(`${feature.properties.place}${new Date(feature.properties.time)}`);
-    //}
-  
-    //let EQ = L.geoJSON(EQdata, {
-      //onEachFeature: onEachFeature
-    //});
-  
+  // Create Map 2
+  let myMap = L.map("map", {
+    center: [37, -95],
+    zoom: 3,
+    layers: [street, EQ]
+  })
 
-  //function markerSize(mag) {
-    //return mag;
-  //}
-  
-  // Define arrays to hold the created city and state markers.
-    //let magMarkers = [];
-    //let depthMarkers = [];
-  
-    // Loop through locations, and create the city and state markers.
-    //for (let i = 0; i < EQ.length; i++) {
-    // Setting the marker radius for the state by passing population into the markerSize function
-      //magMarkers.push(
-        //L.circle(EQ[i].geometry.coordinates, {
-          //stroke: false,
-          //fillOpacity: 0.75,
-          //color: "white",
-          //fillColor: "red",
-          //radius: markerSize(EQ[i].properties.mag)
-        //})
-      //);
-    //}
-  
-    // Set the marker radius for the city by passing the population to the markerSize() function.
-      //depthMarkers.push(
-      //L.circle(EQ[i].geometry.coordinates, {
-        //stroke: false,
-        //fillOpacity: 0.75,
-        //color: "purple",
-        //fillColor: "purple",
-        //radius: markerSize(EQ[i].geometry.coordinates[2])
-      //})
-    //);
-  //}
+  L.control.layers(baseMaps, OLM, {
+    collapsed: false
+  }).addTo(myMap);
+}
 
-  // Create two separate layer groups: one for the city markers and another for the state markers.
-  //let mag = L.layerGroup(magMarkers);
-  //let depth = L.layerGroup(depthMarkers);
+///// 1 /////
+// Create map 1
+//let mymap = L.map("map", {
+  //center: [37, -95],
+  //zoom: 3
+//});
 
-  //let overlaymaps = {
-    //"Magnitude": mag,
-    //"Depth of Crust": depth
-  //};
+///// 1 /////
+// Adding a tile layer
+//L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  //attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//}).addTo(mymap);
 
-  //let legend = L.control({ position: "bottomright" });
-  //legend.onAdd = function() {
-    //let div = L.DomUtil.create("div", "info legend");
-    //let limits = geojson.options.limits;
-    //let colors = geojson.options.colors;
-    //let labels = [];
+///// 1 /////
+//function markerSize(Mag) {
+  //return Mag;
 //}
+
+///// 1 /////
+//let queryurl = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+
+///// 1 /////
+//let mapstyle = {
+  //color: "red",
+  //fillcolor: "blue",
+  //fillOpacity: 0.5,
+  //weight: 1.5
+//};
+
+///// 1 /////
+//d3.json(queryurl).then(function(data) {
+  //L.geoJson(data, {
+    //style: mapstyle
+  //}).addTo(mymap);
+//});
+
+
+
+
+//////////////////////////////////////////////////
+
+// Define arrays to hold the created city and state markers.
+/////let magMarkers = [];
+//let depthMarkers = [];
+
+// Loop through locations, and create the city and state markers.
+/////for (let i = 0; i < EQ.length; i++) {
+
+// Setting the marker radius for the state by passing population into the markerSize function
+  /////magMarkers.push(
+    /////L.circle(EQ[i].geometry.coordinates, {
+      /////stroke: false,
+      /////fillOpacity: 0.75,
+      /////color: "white",
+      /////fillColor: "red",
+      /////radius: markerSize(EQ[i].properties.mag)
+    /////})
+  /////);
+/////}
+
+/////let Mag = L.layerGroup(magMarkers);
+//let depth = L.layerGroup(depthMarkers);
+
+// Set the marker radius for the city by passing the population to the markerSize() function.
+  //depthMarkers.push(
+  //L.circle(EQ[i].geometry.coordinates, {
+    //stroke: false,
+    //fillOpacity: 0.75,
+    //color: "purple",
+    //fillColor: "purple",
+    //radius: markerSize(EQ[i].geometry.coordinates[2])
+  //})
+//);
+//}
+
+/////let overlaymaps = {
+/////"Magnitude": mag
+//"Depth of Crust": depth
+/////};
+
+/////L.control.Layers(null, overlaymaps, {
+  /////collapsed: false
+/////}).addTo(mymap);
+
+  
+
